@@ -19,7 +19,12 @@ window.onload = function() {
                     c.element.setAttribute("id", i + "_" + j);
                     c.element.setAttribute("class", "deadcell");
                     c.element.addEventListener("click",function myfunc() {
-                        this.setAttribute("class", "alivecell");
+                        if (this.getAttribute("class") == "deadcell") {
+                            this.setAttribute("class", "alivecell");
+                        }
+                        else {
+                            this.setAttribute("class", "deadcell");
+                        }
                     });
                     this.cellArray[ i + "_" + j ] = c;
                 }
@@ -167,7 +172,6 @@ window.onload = function() {
 }
 /**
  * TODOs:
- * - Set cell dead button.
  * - Include buttons that generate popular patterns (preferably drag'n'drop).
  */
  
