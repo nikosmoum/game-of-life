@@ -156,7 +156,7 @@ window.onload = function() {
 
     var startBtnListener = function() {
         generator.theTable.syncLifeStatusToDrawing();
-        intervalId = setInterval(function() {generator.lifeAndDeath();}, 200);
+        intervalId = setInterval(function() { generator.lifeAndDeath(); }, 50);
         this.setAttribute("disabled", true);
     }
 
