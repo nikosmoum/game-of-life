@@ -9,7 +9,7 @@ window.onload = function() {
 
         this.buildPetriTable = function() {
             this.tbl = document.createElement("table");
-            this.tbl.setAttribute("class","tborders");
+            this.tbl.setAttribute("class","petritable");
             this.tbl.setAttribute("id", "petritable");
             for (var i = 0; i < this.width ; i++) {
                 var row=this.tbl.insertRow(i);
@@ -17,14 +17,18 @@ window.onload = function() {
                     var c = new Cell(row.insertCell(j));
                     c.setID(i, j);
                     c.element.setAttribute("id", i + "_" + j);
-                    c.element.setAttribute("class", "cborders");
+                    c.element.setAttribute("class", "deadcell");
                     c.element.addEventListener("click",function myfunc() {
-                        this.setAttribute("bgcolor", "black");
+                        this.setAttribute("class", "alivecell");
                     });
                     this.cellArray[ i + "_" + j ] = c;
                 }
             }
             document.body.appendChild(this.tbl);
+        }
+
+        this.deletePetritable = function() {
+            document.getElementById("petritable").remove();
         }
 
         this.getNumberOfNeighbours = function(cell) {
@@ -44,7 +48,7 @@ window.onload = function() {
             if (dir_r < 0 || dir_c < 0 || dir_r > this.width - 1|| dir_c > this.height - 1) {
                 return false;
             }
-            if(this.cellArray[ dir_r + "_" + dir_c ].element.getAttribute("bgcolor") == "black") {
+            if(this.cellArray[ dir_r + "_" + dir_c ].element.getAttribute("class") == "alivecell") {
                 return true;
             }
             return false;
@@ -75,9 +79,9 @@ window.onload = function() {
             for (var i = 0; i < this.width ; i++) {
                 for (var j = 0; j < this.height ; j++) {
                     if (this.cellArray[ i + "_" + j ].alive) {
-                        this.cellArray[ i + "_" + j ].element.setAttribute("bgcolor", "black");
+                        this.cellArray[ i + "_" + j ].element.setAttribute("class", "alivecell");
                     } else {
-                        this.cellArray[ i + "_" + j ].element.setAttribute("bgcolor", "white");
+                        this.cellArray[ i + "_" + j ].element.setAttribute("class", "deadcell");
                     }
                 }
             }
@@ -86,7 +90,7 @@ window.onload = function() {
         this.syncLifeStatusToDrawing = function() {
             for (var i = 0; i < this.width ; i++) {
                 for (var j = 0; j < this.height ; j++) {
-                    if (this.cellArray[ i + "_" + j ].element.getAttribute("bgcolor") == "black") {
+                    if (this.cellArray[ i + "_" + j ].element.getAttribute("class") == "alivecell") {
                         this.cellArray[ i + "_" + j ].alive = true;
                     } else {
                         this.cellArray[ i + "_" + j ].alive = false;
@@ -142,17 +146,28 @@ window.onload = function() {
     }
 
     var generator = new LifeGen(60,80);
-    var btnListener = function() {
+
+    var intervalId;
+
+    var startBtnListener = function() {
         generator.theTable.syncLifeStatusToDrawing();
-        setInterval(function() {generator.lifeAndDeath();}, 200);
+        intervalId = setInterval(function() {generator.lifeAndDeath();}, 200);
         this.setAttribute("disabled", true);
     }
-    document.getElementById("startBtn").addEventListener("click", btnListener, false);
+
+    var resetBtnListener = function() {
+        generator.theTable.deletePetritable();
+        clearInterval(intervalId);
+        document.getElementById("startBtn").removeAttribute("disabled");
+        generator = new LifeGen(60,80);
+    }
+
+    document.getElementById("startBtn").addEventListener("click", startBtnListener, false);
+    document.getElementById("resetBtn").addEventListener("click", resetBtnListener, false);
 }
 /**
  * TODOs:
  * - Set cell dead button.
- * - Reset button.
  * - Include buttons that generate popular patterns (preferably drag'n'drop).
  */
  
