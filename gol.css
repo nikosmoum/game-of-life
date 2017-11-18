@@ -1,0 +1,10 @@
+.tborders {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+.cborders {
+    border: 1px solid lightgrey;
+    border-collapse: collapse;
+    width: 8px;
+    height: 8px;
+}
