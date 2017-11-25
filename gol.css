@@ -5,14 +5,14 @@
 .deadcell {
     border: 1px solid lightgrey;
     border-collapse: collapse;
-    width: 8px;
-    height: 8px;
+    width: 4px;
+    height: 4px;
     background-color: white;
 }
 .alivecell {
     border: 1px solid lightgrey;
     border-collapse: collapse;
-    width: 8px;
-    height: 8px;
+    width: 4px;
+    height: 4px;
     background-color: black;
 }
