@@ -11,10 +11,47 @@ window.onload = function() {
         this.height = h;
         this.htmlPetriTable;
         this.cellArray = new Array();
+        this.getWidth = getWidth;
+        this.getHeight = getHeight;
+        this.getCell = getCell;
+        this.buildCellObject = buildCellObject;
+        this.assignCellToArray = assignCellToArray;
         this.buildPetriTable = buildPetriTable;
         this.deletePetritable = deletePetritable;
-        this.reDrawLifeStatus = reDrawLifeStatus;
+        this.syncDrawingStatusToLife = syncDrawingStatusToLife;
         this.syncLifeStatusToDrawing = syncLifeStatusToDrawing;
+
+        function getWidth() {
+            return this.width;
+        }
+
+        function getHeight() {
+            return this.height;
+        }
+
+        function getCell(width, height) {
+            return this.cellArray[ width + "_" + height ];
+        }
+
+        function buildCellObject(cellHTMLElement, width, height) {
+            var newCell = new Cell(cellHTMLElement);
+            newCell.setID(width, height);
+            newCell.setAttribute("id", width + "_" + height);
+            newCell.setAttribute("class", "deadcell");
+            newCell.addEventListener("click",function myfunc() {
+                if (this.getAttribute("class") == "deadcell") {
+                    this.setAttribute("class", "alivecell");
+                }
+                else {
+                    this.setAttribute("class", "deadcell");
+                }
+            });
+            return newCell;
+        }
+
+        function assignCellToArray(cell, width, height) {
+            this.cellArray[ width + "_" + height ] = cell;
+        }
 
         function buildPetriTable() {
             this.htmlPetriTable = document.createElement("table");
@@ -22,21 +59,11 @@ window.onload = function() {
             this.htmlPetriTable.setAttribute("id", "petritable");
 
             for (var i = 0; i < this.width ; i++) {
-                var row=this.htmlPetriTable.insertRow(i);
+                var rowHTMLElement = this.htmlPetriTable.insertRow(i);
                 for (var j = 0; j < this.height ; j++) {
-                    var c = new Cell(row.insertCell(j));
-                    c.setID(i, j);
-                    c.setAttribute("id", i + "_" + j);
-                    c.setAttribute("class", "deadcell");
-                    c.addEventListener("click",function myfunc() {
-                        if (this.getAttribute("class") == "deadcell") {
-                            this.setAttribute("class", "alivecell");
-                        }
-                        else {
-                            this.setAttribute("class", "deadcell");
-                        }
-                    });
-                    this.cellArray[ i + "_" + j ] = c;
+                    var cellHTMLElement = rowHTMLElement.insertCell(j);
+                    var newCell = buildCellObject(cellHTMLElement, i, j);
+                    this.assignCellToArray(newCell, i, j);
                 }
             }
 
@@ -47,10 +74,10 @@ window.onload = function() {
             document.getElementById("petritable").remove();
         }
 
-        function reDrawLifeStatus() {
+        function syncDrawingStatusToLife() {
             for (var i = 0; i < this.width ; i++) {
                 for (var j = 0; j < this.height ; j++) {
-                    var currentCell = this.cellArray[ i + "_" + j ];
+                    var currentCell = this.getCell(i, j);
                     if (currentCell.isAlive()) {
                         currentCell.setAttribute("class", "alivecell");
                     } else {
@@ -63,7 +90,7 @@ window.onload = function() {
         function syncLifeStatusToDrawing() {
             for (var i = 0; i < this.width ; i++) {
                 for (var j = 0; j < this.height ; j++) {
-                    var currentCell = this.cellArray[ i + "_" + j ];
+                    var currentCell = this.getCell(i, j);
                     if (currentCell.getAttribute("class") == "alivecell") {
                         currentCell.setAlive(true);
                     } else {
@@ -151,14 +178,19 @@ window.onload = function() {
         }
 
         function isNeighbourAlive(index, coords, table) {
-            var dir_r = coords[index];
-            var dir_c = coords[index+1];
-            if (dir_r < 0 || dir_c < 0 || dir_r > table.width - 1|| dir_c > table.height - 1) {
+            var dir_r = coords[ index ];
+            var dir_c = coords[ index + 1 ];
+
+            if (dir_r < 0 || dir_c < 0 ||
+                dir_r > table.getWidth() - 1 ||
+                dir_c > table.getHeight() - 1) {
                 return false;
             }
-            if(table.cellArray[ dir_r + "_" + dir_c ].getAttribute("class") == "alivecell") {
+
+            if(table.getCell(dir_r, dir_c).getAttribute("class") == "alivecell") {
                 return true;
             }
+
             return false;
         }
     }
@@ -171,11 +203,11 @@ window.onload = function() {
         this.lifeAndDeath = lifeAndDeath;
 
         function lifeAndDeath() {
-            this.theTable.reDrawLifeStatus();
+            this.theTable.syncDrawingStatusToLife();
 
             for (var i = 0; i < this.width ; i++) {
                 for (var j = 0; j < this.height ; j++) {
-                    var currentCell = this.theTable.cellArray[ i + "_" + j ];
+                    var currentCell = this.theTable.getCell(i, j);
                     var nOn = currentCell.getNumberOfNeighbours(this.theTable);
                     if (currentCell.isAlive()) {
                         if (nOn < 2) {
