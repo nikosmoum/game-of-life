@@ -3,6 +3,7 @@ window.onload = function() {
 /**
  * TODOs:
  * - Include buttons that generate popular patterns (preferably drag'n'drop).
+ * - Make the game more colorful by creating mapping between specific colors and number generations.
  */
 
     function Petritable(w, h)
